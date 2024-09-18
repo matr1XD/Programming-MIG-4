@@ -5,8 +5,8 @@ using namespace std;
 
 struct Edge {
     int v;             // Target vertex
-    int flow;          // Current flow through the edge
-    int capacity;      // Capacity of the edge
+    int flow;          
+    int capacity;      
     Edge* reverse;     // Pointer to the reverse edge
 
     Edge(int v, int capacity) : v(v), flow(0), capacity(capacity), reverse(nullptr) {}
@@ -68,7 +68,7 @@ public:
         vector<Edge*> parent(V);
 
         int flow;
-        // Augment the flow while there's a path from source to sink
+        // While there's a path from source to sink
         while (flow = bfs(s, t, parent)) {
             total_flow += flow;
 
@@ -77,7 +77,7 @@ public:
             while (cur != s) {
                 Edge* edge = parent[cur];
                 edge->flow += flow;               // Update forward edge's flow
-                edge->reverse->flow -= flow;      // Update reverse edge's flow (residual capacity)
+                edge->reverse->flow -= flow;      // Update reverse edge's flow
                 cur = edge->reverse->v;
             }
         }
@@ -104,9 +104,9 @@ public:
     int fordFulkerson(int s, int t) {
         int total_flow = 0;
         vector<Edge*> parent(V, nullptr);  // To store the path
-        vector<bool> visited(V, 0);    // To keep track of visited nodes
+        vector<bool> visited(V, 0);
 
-        // Augment the flow while there is an augmenting path
+        // While there's a path from source to sink
         while(dfs(s, t, parent, visited)) {
             int flow = INF;
             int cur = t;
@@ -116,7 +116,7 @@ public:
                 cur = edge->reverse->v;
             }
 
-            // Update the flow values along the path
+            // Update the flow values
             cur = t;
             while (cur != s) {
                 Edge* edge = parent[cur];
@@ -125,7 +125,7 @@ public:
                 cur = edge->reverse->v;
             }
 
-            total_flow += flow;  // Add the flow from this path to the total flow
+            total_flow += flow; 
         }
 
         return total_flow;
@@ -187,6 +187,7 @@ class GraphMatrix
         int total_flow = 0;
         vector<int> parent(V);
 
+        // While there's a path from source to sink
         while (bfs(s, t, parent)) {
             int flow = INF;
             int v = t;
@@ -231,6 +232,7 @@ class GraphMatrix
         vector<int> parent(V, -1);
         vector<bool> visited(V, 0);
 
+        // While there's a path from source to sink
         while (dfs(s, t, parent, visited)) {
             int flow = INF;
             int v = t;
@@ -274,7 +276,8 @@ int main()
     cin>>type;
     cout<<"Enter e for Edmonds Karp, or f for Ford Fulkerson"<<endl;
     cin>>alg;
-
+    // I am doing this because my List and Matrix change after using one of the algorithms
+    // AKA this is replacing temp List and Matrix
     int vertices = 6, source = 0, sink = 5;
 
     if(type == 'l')
