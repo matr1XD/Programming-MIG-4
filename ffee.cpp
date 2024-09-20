@@ -227,13 +227,13 @@ class GraphMatrix
         return false;
     }
 
-    int fordFulkerson(int s, int t) {
+ int fordFulkerson(int s, int t) {
         int total_flow = 0;
         vector<int> parent(V, -1);
-        vector<bool> visited(V, 0);
 
-        // While there's a path from source to sink
-        while (dfs(s, t, parent, visited)) {
+        while (true) {
+            vector<bool> visited(V, 0);
+            if(!dfs(s, t, parent, visited)) break;
             int flow = INF;
             int v = t;
 
