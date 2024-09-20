@@ -1,0 +1,46 @@
+struct Edge: 
+- v: target vertex the edge points to
+- flow: the current flow across this edge >= 0
+- capacity: maximum flow of this edge
+- reverse: a pointer to the reverse edge for handling residual flow
+- Constructor
+
+class GraphList:
+- represents the graph as an adjacency list where each vertex holds a 
+list of pointers to Edge objects
+- void addEdge: adds a directed edge from u to v with a given capacity
+also creates a reverse edge from v to u with 0 capacity to represent
+residual flow. links the forward and reverse edges so that they can be 
+updated simultaneously during the flow calculations.
+on u-th posititon in adj are added all pointers toward u's neighbors
+- bfs: performs a bfs from source s to sink t to find an augmenting path
+parent keeps track of the edges used to reach each vertex during bfs
+returns the flow along the path found by bfs, or 0 if no path found
+in adj[cur] are stored edges, with for we are traversing all of these edges
+if there exists a parent to the edge's vertex and the edge's vertex is not s
+and the edge's flow is less than its capacity, then, (why?) edge's vertex's
+parent is edge.
+new flow is minimum of flow in cur edge and the difference of cap and flow
+if we reached a sink, return the flow
+if not, push edge's vertex and new flow to queue
+- edmonds karp:repeatedly calls bfs to find augmenting paths and updates
+the flow values along the path
+total flow is accumilates in total_flow
+parent is used in bfs.
+while there is a path, add the flow to total_flow
+update the capacities and reverse flows along the path
+while cur = sink is not source do: edge is parent of cur, edge's flow 
++= flow, edge's reverse flow -= flow, cur = edge's reverse vertex
+- dfs: 
+if source is sink, return true
+s is visited
+traversing every neighbor of adj[s] as edge. is edge's vertex is not visited
+and edge's flow is less than edge's cap, then, parent of edge's vertex is edge
+recursion dfs with edge's vertex instead of s
+- ford fulkerson: using dfs to find paths. if there is a path set flow to inf,
+cur = sink. while cur is not source, edge is cur's parent. flow is min
+of flow and edge's cap - edge's flow, cur = edge's reverse vertex
+updating cur = t to change values. while cur is not source
+edge is cur's parent, edge's flow += flow, edge's reverse flow -= flow
+cur = edge's reverse vertex
+
