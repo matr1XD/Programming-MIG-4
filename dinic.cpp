@@ -129,7 +129,7 @@ int main()
         m.addEdge(3, 5, 20);
         m.addEdge(4, 3, 7);
         m.addEdge(4, 5, 4);
-        cout<<"Max flow (Matrix: Dinic) " << m.dinic(source, sink) << endl;
+        cout<<"Max flow (List: Dinic) " << m.dinic(source, sink) << endl;
 
     return 0;
 }
