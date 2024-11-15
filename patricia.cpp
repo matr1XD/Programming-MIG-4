@@ -3,11 +3,10 @@ using namespace std;
 
 class PatriciaNode
 {
-  public:
     string word;
     bool end;
     PatriciaNode * child[26];
-    
+  public: 
     PatriciaNode(string word = "", bool end = false)
     {
         this->word = word;
