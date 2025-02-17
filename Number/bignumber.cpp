@@ -1,14 +1,12 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-
 class Number {
 
     private:
-    vector<int> digits; // Digits stored in reverse order (least-significant digit first).
-    int sign;                // 1 for positive numbers, -1 for negatives.
+    vector<int> digits; 
+    int sign;   // 1 for positive numbers, -1 for negatives.
 
-    // Helper function to add two vectors representing absolute values.
     static vector<int> addVectors(const vector<int>& a, const vector<int>& b) {
         vector<int> res;
         int carry = 0;
@@ -23,8 +21,7 @@ class Number {
         return res;
     }
     
-    // Helper function to subtract vector b from vector a (absolute values).
-    // Assumes that a >= b.
+    // Assumes that a >= b
     static vector<int> subtractVectors(const vector<int>& a, const vector<int>& b) {
         vector<int> res = a;
         int carry = 0;
@@ -45,8 +42,8 @@ class Number {
         return res;
     }
     
-    // Compare the absolute values of two Number objects.
-    // Returns 1 if |this| > |other|, -1 if |this| < |other|, or 0 if equal.
+    // Compare the absolute values of two Number objects
+    // Returns 1 if |this| > |other|, -1 if |this| < |other|, or 0 if equal
     int compareAbs(const Number &other) const {
         if (digits.size() != other.digits.size())
             return digits.size() > other.digits.size() ? 1 : -1;
@@ -56,8 +53,17 @@ class Number {
         }
         return 0;
     }
+
+    string toString() const {
+        string str;
+        if (sign == -1 && !(digits.size() == 1 && digits[0] == 0))
+            str.push_back('-');
+        for (int i = digits.size() - 1; i >= 0; i--)
+            str.push_back(digits[i] + '0');
+        return str;
+    }
     
-    // Remove extra leading zeros from the internal representation.
+    // Remove leading zeros
     void removeLeadingZeros() {
         while (digits.size() > 1 && digits.back() == 0)
             digits.pop_back();
@@ -65,12 +71,10 @@ class Number {
             sign = 1;
     }
 public:
-    // Constructor that converts a string to a Number.
-    // It handles an optional leading '+' or '-' sign.
+    // Constructor that converts a string to a Number
     Number(const string &str) : sign(1), digits() {
 
         int index = 0;
-        // Check for a leading sign.
         if (str[0] == '-') {
             sign = -1;
             index++;
@@ -79,37 +83,36 @@ public:
             index++;
         }
         
-        // Skip any leading zeros.
+        // Skip leading zeros
         while (index < str.size() && str[index] == '0') {
             index++;
         }
         
-        // If all characters are zeros, the number is 0.
+        // If all characters are zeros, the number is 0
         if (index == str.size()) {
             digits.push_back(0);
-            sign = 1; // Zero is non-negative.
+            sign = 1;
             return;
         }
 
-        // Store each digit in reverse order for easier arithmetic.
+        // Store in reverse for easier arithmetic
         for (int i = index; i < str.size(); i++) {
             digits.push_back(str[i] - '0');
         }
         reverse(digits.begin(), digits.end());
     }
     
-    // Default constructor initializes the number to 0.
+    // Default constructor
     Number() : sign(1), digits(1, 0) {}
 
-    // Overload the addition operator.
     Number operator+(const Number &other) const {
         Number result;
-        // Case 1: Both numbers have the same sign -> add absolute values.
+        //Both numbers have the same sign -> add absolute values
         if (this->sign == other.sign) {
             result.digits = addVectors(this->digits, other.digits);
             result.sign = this->sign;
         }
-        // Case 2: Different signs -> subtract the smaller absolute value from the larger one.
+        // Different signs -> subtract the smaller absolute value from the larger one
         else {
             int cmp = compareAbs(other);
             if (cmp == 0) {
@@ -126,12 +129,12 @@ public:
         return result;
     }
     
-    // Overload the subtraction operator as a + (-other)
+    // Overload the operator
     Number operator-(const Number &other) const {
         return *this + (-other);
     }
     
-    // Unary minus operator to negate the number.
+    // Unary minus operator
     Number operator-() const {
         Number result(*this);
         if (!(result.digits.size() == 1 && result.digits[0] == 0))
@@ -172,11 +175,10 @@ public:
     }
 
     Number operator/(const Number &other) const {
-        // If |dividend| < |divisor|, quotient is 0.
+        // If |dividend| < |divisor| quotient is 0.
         if (this->compareAbs(other) < 0)
             return Number("0");
         
-        // Work with absolute values.
         Number dividendAbs = *this; dividendAbs.sign = 1;
         Number divisorAbs = other; divisorAbs.sign = 1;
         
@@ -189,7 +191,6 @@ public:
             remainder = remainder * Number("10");
             remainder = remainder + Number(string(1, ch));
             
-            // Determine how many times divisorAbs fits into remainder.
             int count = 0;
             while (remainder.compareAbs(divisorAbs) >= 0) {
                 remainder = remainder - divisorAbs;
@@ -197,7 +198,7 @@ public:
             }
             quotientStr.push_back('0' + count);
         }
-        // Remove any leading zeros from quotientStr.
+        // Remove any leading zeros
         int pos = quotientStr.find_first_not_of('0');
         if (pos != string::npos)
             quotientStr = quotientStr.substr(pos);
@@ -210,21 +211,44 @@ public:
             result.sign = 1;
         return result;
     }
+
+    Number operator%(const Number &other) const{
+        return *this - ((*this) / other) * other;
+    }
+
+    bool operator==(const Number & other) const{
+        return this->toString() == other.toString();
+    }
     
-    string toString() const {
-        string str;
-        if (sign == -1 && !(digits.size() == 1 && digits[0] == 0))
-            str.push_back('-');
-        for (int i = digits.size() - 1; i >= 0; i--)
-            str.push_back(digits[i] + '0');
-        return str;
+    bool operator<(const Number & other) const{
+        if(this->sign != other.sign)
+            return this->sign < other.sign;
+        if(digits.size() != other.digits.size())
+            return (this->sign == 1) ? (digits.size() < other.digits.size()) : (digits.size() > other.digits.size());
+        for(int i = digits.size() - 1; i >= 0; i--)
+        {
+            if(digits[i] != other.digits[i])
+                return (this->sign == 1) ? (digits[i] < other.digits[i]) : (digits[i] > other.digits[i]);
+        }
+        return false;
+    }
+    
+    bool operator<=(const Number & other) const{
+        return (*this < other) or (*this == other);
+    }
+
+    bool operator>(const Number & other) const{
+        return !(*this <= other);
+    }
+
+    bool operator>=(const Number & other) const{
+        return !(*this < other);
     }
     
     friend ostream &operator<<(ostream &out, const Number &num) {
         out << num.toString();
         return out;
     }
-
 };
 
 int main() {
