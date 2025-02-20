@@ -6,9 +6,9 @@ class Number {
 
     private:
     vector<int> digits; 
-    int sign;   // 1 for positive numbers, -1 for negatives.
+    int sign;   // 1 for positive -1 for negatives
 
-    static vector<int> addVectors(const vector<int>& a, const vector<int>& b) {
+    vector<int> addVectors(const vector<int>& a, const vector<int>& b) {
         vector<int> res;
         int carry = 0;
         int n = max(a.size(), b.size());
@@ -23,7 +23,7 @@ class Number {
     }
     
     // Assumes that a >= b
-    static vector<int> subtractVectors(const vector<int>& a, const vector<int>& b) {
+    vector<int> subtractVectors(const vector<int>& a, const vector<int>& b) {
         vector<int> res = a;
         int carry = 0;
         for (int i = 0; i < b.size() || carry; i++) {
@@ -64,7 +64,6 @@ class Number {
         return str;
     }
     
-    // Remove leading zeros
     void removeLeadingZeros() {
         while (digits.size() > 1 && digits.back() == 0)
             digits.pop_back();
@@ -96,7 +95,7 @@ public:
             return;
         }
 
-        // Store in reverse for easier arithmetic
+        // Store in reverse
         for (int i = index; i < str.size(); i++) {
             digits.push_back(str[i] - '0');
         }
