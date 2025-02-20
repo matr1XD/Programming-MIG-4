@@ -5,13 +5,13 @@ class Number {
 
     private:
     vector<int> digits; 
-    int sign;   // 1 for positive numbers, -1 for negatives.
+    int sign;   // 1 for positive, -1 for negatives
 
-    static vector<int> addVectors(const vector<int>& a, const vector<int>& b) {
+    vector<int> addVectors(const vector<int>& a, const vector<int>& b) {
         vector<int> res;
         int carry = 0;
         int n = max(a.size(), b.size());
-        for (int i = 0; i < n || carry; i++) {
+        for (int i = 0; i < n or carry; i++) {
             int d1 = (i < a.size() ? a[i] : 0);
             int d2 = (i < b.size() ? b[i] : 0);
             int sum = d1 + d2 + carry;
@@ -22,10 +22,10 @@ class Number {
     }
     
     // Assumes that a >= b
-    static vector<int> subtractVectors(const vector<int>& a, const vector<int>& b) {
+     vector<int> subtractVectors(const vector<int>& a, const vector<int>& b) {
         vector<int> res = a;
         int carry = 0;
-        for (int i = 0; i < b.size() || carry; i++) {
+        for (int i = 0; i < b.size() or carry; i++) {
             int d1 = res[i];
             int d2 = (i < b.size() ? b[i] : 0);
             int sub = d1 - d2 - carry;
@@ -42,7 +42,7 @@ class Number {
         return res;
     }
     
-    // Compare the absolute values of two Number objects
+    // Compare the absolute values of two Numbers
     // Returns 1 if |this| > |other|, -1 if |this| < |other|, or 0 if equal
     int compareAbs(const Number &other) const {
         if (digits.size() != other.digits.size())
@@ -63,7 +63,6 @@ class Number {
         return str;
     }
     
-    // Remove leading zeros
     void removeLeadingZeros() {
         while (digits.size() > 1 && digits.back() == 0)
             digits.pop_back();
@@ -78,7 +77,8 @@ public:
         if (str[0] == '-') {
             sign = -1;
             index++;
-        } else if (str[0] == '+') {
+        } 
+        else if (str[0] == '+') {
             sign = 1;
             index++;
         }
@@ -95,7 +95,7 @@ public:
             return;
         }
 
-        // Store in reverse for easier arithmetic
+        // Store in reverse 
         for (int i = index; i < str.size(); i++) {
             digits.push_back(str[i] - '0');
         }
