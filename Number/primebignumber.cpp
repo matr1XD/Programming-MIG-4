@@ -5,11 +5,10 @@ using namespace std;
 class Number {
 
     private:
-    vector<int> digits; // Digits stored in reverse order (least-significant digit first).
-    int sign;                // 1 for positive numbers, -1 for negatives.
+    vector<int> digits; 
+    int sign;                // 1 for positive, -1 for negatives
 
-    // Helper function to add two vectors representing absolute values.
-    static vector<int> addVectors(const vector<int>& a, const vector<int>& b) {
+    vector<int> addVectors(const vector<int>& a, const vector<int>& b) {
         vector<int> res;
         int carry = 0;
         int n = max(a.size(), b.size());
@@ -23,9 +22,8 @@ class Number {
         return res;
     }
     
-    // Helper function to subtract vector b from vector a (absolute values).
-    // Assumes that a >= b.
-    static vector<int> subtractVectors(const vector<int>& a, const vector<int>& b) {
+// Assumes that a >= b.
+    vector<int> subtractVectors(const vector<int>& a, const vector<int>& b) {
         vector<int> res = a;
         int carry = 0;
         for (int i = 0; i < b.size() || carry; i++) {
@@ -45,8 +43,8 @@ class Number {
         return res;
     }
     
-    // Compare the absolute values of two Number objects.
-    // Returns 1 if |this| > |other|, -1 if |this| < |other|, or 0 if equal.
+    // Compare the absolute values of two Number objects
+    // Returns 1 if |this| > |other|, -1 if |this| < |other|, or 0 if equal
     int compareAbs(const Number &other) const {
         if (digits.size() != other.digits.size())
             return digits.size() > other.digits.size() ? 1 : -1;
@@ -65,17 +63,13 @@ class Number {
             str.push_back(digits[i] + '0');
         return str;
     }
-    
-    // Remove extra leading zeros from the internal representation.
-    void removeLeadingZeros() {
+        void removeLeadingZeros() {
         while (digits.size() > 1 && digits.back() == 0)
             digits.pop_back();
         if (digits.size() == 1 && digits[0] == 0)
             sign = 1;
     }
 public:
-    // Constructor that converts a string to a Number.
-    // It handles an optional leading '+' or '-' sign.
     Number(const string &str) : sign(1), digits() {
 
         int index = 0;
@@ -88,19 +82,18 @@ public:
             index++;
         }
         
-        // Skip any leading zeros.
         while (index < str.size() && str[index] == '0') {
             index++;
         }
         
-        // If all characters are zeros, the number is 0.
+        // If all characters are zeros, the number is 0
         if (index == str.size()) {
             digits.push_back(0);
             sign = 1; // Zero is non-negative.
             return;
         }
 
-        // Store each digit in reverse order for easier arithmetic.
+        // Store in reverse
         for (int i = index; i < str.size(); i++) {
             digits.push_back(str[i] - '0');
         }
@@ -110,7 +103,6 @@ public:
     // Default constructor initializes the number to 0.
     Number() : sign(1), digits(1, 0) {}
 
-    // Overload the addition operator.
     Number operator+(const Number &other) const {
         Number result;
         // Case 1: Both numbers have the same sign -> add absolute values.
@@ -135,12 +127,11 @@ public:
         return result;
     }
     
-    // Overload the subtraction operator as a + (-other)
     Number operator-(const Number &other) const {
         return *this + (-other);
     }
     
-    // Unary minus operator to negate the number.
+    // Unary minus operator 
     Number operator-() const {
         Number result(*this);
         if (!(result.digits.size() == 1 && result.digits[0] == 0))
