@@ -55,9 +55,12 @@ class Matrix
     Matrix operator*(Matrix &other) 
     {
         Matrix result(row, other.col);
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < other.col; j++) {
-                for (int k = 0; k < col; k++) {
+        for (int i = 0; i < row; i++) 
+        {
+            for (int j = 0; j < other.col; j++) 
+            {
+                for (int k = 0; k < col; k++) 
+                {
                     result.m[i][j] += m[i][k] * other.m[k][j];
                 }
             }
@@ -79,8 +82,10 @@ class Matrix
 
     friend ostream& operator<<(ostream &out, Matrix & mat) 
     {
-        for (int i = 0; i < mat.row; i++) {
-            for (int j = 0; j < mat.col; j++) {
+        for (int i = 0; i < mat.row; i++) 
+        {
+            for (int j = 0; j < mat.col; j++) 
+            {
                 out << setw(10) << mat.m[i][j] << " ";
             }
             out << endl;
@@ -137,16 +142,15 @@ class Matrix
             {
                 aug[i][j] = m[i][j];
             }
-            aug[i][n + i] = 1.0; // Set the identity matrix on the right.
+            aug[i][n + i] = 1.0; //Identity matrix on the right
         }
         
-        //elimination
+        //Elimination
         for (int i = 0; i < n; i++) 
         {
             double pivot = aug[i][i];
             if (fabs(pivot) < 1e-9) 
             {
-                // Try to swap with a lower ro
                 bool swapped = false;
                 for (int k = i + 1; k < n; k++) 
                 {
@@ -158,8 +162,7 @@ class Matrix
                         break;
                     }
                 }
-                if (!swapped)
-                    throw runtime_error("Matrix is singular and cannot be inverted.");
+                
             }
             
             for (int j = 0; j < 2 * n; j++) 
