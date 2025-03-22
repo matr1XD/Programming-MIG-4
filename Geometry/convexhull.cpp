@@ -1,6 +1,3 @@
-//The polygon is convex if the z-components of 
-//the cross products are either all positive 
-//or all negative. Otherwise the polygon is nonconvex.
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -18,203 +15,113 @@ struct Point
 
     friend ostream& operator<<(ostream& os, const Point& a)
     {
-        os << "(" << a.x << ", " << a.y << ", " << ")";
+        os<<"("<<a.x<<", "<<a.y<<")";
         return os;
     }
 };
 
-Point mid(0,0); //global because is used in compare funciton
-int quad(Point p) //determines thje quadrant of a point
+int ccw(Point a, Point b, Point c)
 {
-    if(p.x >= 0 and p.y >= 0) return 1;
-    if(p.x <= 0 and p.y >= 0) return 2;
-    if(p.x <= 0 and p.y <= 0) return 3;
-    return 4;
+    double area = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+    if(area < 0) return -1; //clockwise
+    if(area > 0) return 1; //counterclockwise
+    return 0; //collinear
 }
 
-int orientation(Point a, Point b, Point c) //checks if the line is crossing the plane
+Point getMinY(vector<Point> & points) //find the point with the lowest Y coordinate
 {
-    int result = (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x); //formula from analytical heometry for finding K with 3 points
-    if(result == 0) return 0;
-    if(result > 0) return 1;
-    return -1;
-}
-
-bool compare(Point p1, Point q1)
-{
-    Point p(p1.x-mid.x, p1.y-mid.y);
-    Point q(q1.x-mid.x, q1.y-mid.y);
-
-    int one = quad(p);
-    int two = quad(q);
-
-    if(one != two) return (one < two);
-    return (p.y * q.x < p.x * q.y);
-}
-
-vector<Point> merger(vector<Point> a, vector<Point> b)
-{
-    int n1 = a.size();
-    int n2 = b.size(); //number of points in polygons a and b
-
-    int ia = 0, ib = 0;
-    for(int i=1; i<n1; i++)
+    double tempx = points[0].x;
+    double tempy = points[0].y;
+    int index = 0;
+    for(int i = 1; i < points.size(); i++)
     {
-        if(a[i].x > a[ia].x) 
-            ia = i;
-    }
-
-    for(int i=1; i<n2; i++)
-    {
-        if(b[i].x < b[ib].x)
-            ib = i;
-    }
-
-    //find the upper tangent
-    int inda = ia, indb = ib;
-    bool flag = 0;
-    while(!flag)
-    {
-        flag = 1;
-        while(orientation(b[indb], a[inda], a[(inda+1)%n1]) >= 0)
-            inda = (inda+1)%n1;
-        
-        while(orientation(a[inda], b[indb], b[(n2+indb-1)%n2]) <= 0)
+        if(tempy < points[i].y)
         {
-            indb = (n2+indb-1)%n2;
-            flag = 0;
+            tempy = points[i].y;
+            tempx = points[i].x;
+            index = i;
+        }
+        else if(tempy == points[i].y and tempx < points[i].x)
+        {
+            tempy = points[i].y;
+            tempx = points[i].x;
+            index = i;
         }
     }
-
-    int uppera = inda, upperb = indb;
-    inda = ia, indb = ib;
-    flag = 0;
-    int g = 0;
-
-    while(!flag)
-    {
-        flag = 1;
-        while(orientation(a[inda], b[indb], b[(indb+1) % n2]) >= 0)
-            indb = (indb+1)  % n2;
-
-        while(orientation(b[indb],a[inda], a[(inda-1+n1) % n1]) <= 0)
-        {
-            inda = (inda-1 + n1)  % n1;
-            flag = 0;
-        }    
-    }
-
-    int lowera = inda, lowerb = indb;
-    vector<Point> ret;
-
-    int ind = uppera;
-    ret.push_back(a[uppera]);
-    while(ind != lowera)
-    {
-        ind = (ind+1) % n1;
-        ret.push_back(a[ind]);
-    }
-
-    ind = lowerb;
-    ret.push_back(b[lowerb]);
-    while (ind != upperb)
-    {
-        ind = (ind + 1) % n2;
-        ret.push_back(b[ind]);
-    }
-    return ret;    
+    return points[index];
 }
 
-vector<Point> bruteHull(vector<Point> a)
+bool compare(Point b, Point c, Point ref) //lambda function
 {
-    set<Point> s;
+    if(b.x == ref.x and b.y == ref.y) return true;
+    if(c.x == ref.x and c.y == ref.y) return false;
 
-    for(int i=0; i<a.size(); i++)
+    int turn = ccw(ref, b, c);
+    if(turn == 0)
     {
-        for(int j=i+1; j<a.size(); j++)
+        return(b.x < c.x) or (b.x == c.x and b.y < c.y);
+    }
+    return turn > 0;
+}
+
+void sortAngle(vector<Point> & points, Point & ref)
+{
+    sort(points.begin(), points.end(), [&ref](const Point& b, const Point& c) {
+        return compare(b, c, ref);
+    });
+}
+
+vector<Point> convexhull(vector<Point> points)
+{
+    stack<Point> s;
+    Point mini = getMinY(points);
+    sortAngle(points, mini);
+
+    s.push(points[0]);
+    s.push(points[1]);
+
+    for(int i = 2; i < points.size(); i++)
+    {
+        Point next = points[i];
+        Point p = s.top();
+        s.pop();
+
+        while(!s.empty() and ccw(s.top(), p, next) <= 0)
         {
-            double x1 = a[i].x, x2 = a[j].x;
-            double y1 = a[i].y, y2 = a[j].y;
-
-            double a1 = y1 - y2;
-            double b1 = x2 - x1;
-            double c1 = x1 * y2 - y1 * x2;
-            double pos = 0, neg = 0;
-            for(int k = 0; k < a.size(); k++)
-            {
-                if(a1 * a[k].x + b1 * a[k].y + c1 <= 0)
-                    neg++;
-                if(a1 * a[k].x + b1 * a[k].y + c1 >= 0)
-                    pos++;
-            }
-            if(pos == a.size() or neg == a.size())
-            {
-                s.insert(a[i]);
-                s.insert(a[j]);
-            }
+            p = s.top();
+            s.pop();
         }
+
+        s.push(p);
+        s.push(next);
     }
 
-    vector<Point> result(s.begin(), s.end());
-    mid = Point(0,0);
-    for(auto e : s)
-        result.push_back(e);
+    Point p = s.top();
+    s.pop();
+    if(ccw(s.top(), p, mini) > 0)
+    {
+         s.push(p);
+    }
 
-    //sorting the points in anti clockwise order
-    int n = result.size();
-    for(int i = 0; i < n; i++)
+    vector<Point> result;
+    while(!s.empty())
     {
-        mid.x += result[i].x;
-        mid.y += result[i].y;
-        result[i].x *= n;
-        result[i].y *= n;
+        result.push_back(s.top());
+        s.pop();
     }
-    sort(result.begin(), result.end(), compare);
-    for(int i = 0; i < n; i++)
-    {
-        Point temp(result[i].x / n, result[i].y / n);
-        result[i] = temp;
-    }
+
+    reverse(result.begin(), result.end());
     return result;
-}
-
-vector<Point> divide(vector<Point> a)
-{
-    if(a.size() <= 5) return bruteHull(a);
-
-    vector<Point> left, right;
-    for(int i = 0; i < a.size() / 2; i++)
-        left.push_back(a[i]);
-    for(int i = a.size() / 2; i < a.size(); i++)
-        right.push_back(a[i]);
-    
-    vector<Point> leftHull = divide(left);
-    vector<Point> rightHull = divide(right);
-
-    return merger(leftHull, rightHull);
 }
 
 int main()
 {
-    vector<Point> a;
-    cout<<"Enter the number of points: ";
-    int n; cin>>n;
+    vector <Point> points = {{0,3}, {2,2}, {1,1}, {2,1}, {3,0}, {0,0}, {3,3}};
+    vector <Point> result = convexhull(points);
 
-
-    cout<<"Enter the points: "<<endl; 
-    for(int i=0; i<n; i++)
-    {
-        int first, second; cin>>first>>second;
-        Point temp(first, second);
-        a.push_back(temp);
-    }
-
-    sort(a.begin(), a.end());
-    vector<Point> ans = divide(a);
-
-    cout<<"Convex Hull: "<<endl;
-    for(auto e : ans)
-        cout<<e.x<<" "<<e.y<<endl;
+    cout<<"Convex hull: "<<endl;
+    for(int i = 0; i < result.size(); i++)
+        cout<<result[i]<<endl;
 
     return 0;
 }
